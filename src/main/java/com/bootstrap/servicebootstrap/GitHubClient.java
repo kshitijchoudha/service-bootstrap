@@ -18,7 +18,7 @@ public class GitHubClient {
 
     public void createSpringBootHelmRepo(String applicationName, String templateName) throws IOException
     {
-        logger.debug("GH API Tonek: "+System.getenv("GH_API_TOKEN"));
+        //logger.debug("GH API Tonek: "+System.getenv("GH_API_TOKEN"));
         GitHub github = new GitHubBuilder().withOAuthToken(System.getenv("GH_API_TOKEN")).build();
         GHCreateRepositoryBuilder ghRepoBuilder = github.createRepository(applicationName);
         ghRepoBuilder.fromTemplateRepository("kshitijchoudha", templateName);

@@ -18,37 +18,45 @@ public class ServiceBootstrapApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) {
 		logger.info("Starting service bootstrap..");
-		boolean logTest = false;
-		if (logTest) {
-			logger.trace("Trace Log");
-			logger.debug("Debug Log");
-			logger.info("Info Log");
-			logger.error("Error Log");
-			return;
-		}
 
 		String serviceName = "";
 		String templateName = "";
 
-		if (args == null || args.length < 2) {
-			logger.error("Enter service name and template name");
+		System.out.println("Enter Service Name: ");
+		serviceName = System.console().readLine();
+
+		System.out.println(String.join("\n", "Enter number for service type and deployment type template to use",
+				"1. Spring Boot with Helm Deployment", "2. Python Flask with kuberetes manifest deployment"));
+
+		templateName = System.console().readLine();
+
+		if(templateName == null || (!templateName.trim().equalsIgnoreCase("1") && !templateName.trim().equalsIgnoreCase("2")))
+		{
+			System.out.println("Only options are 1 or 2, you entered: "+templateName+"END");
 			return;
-		} else {
-			serviceName = args[0];
-			templateName = args[1];
 		}
+
+		templateName = templateName.trim().equalsIgnoreCase("1") ? "spring-boot-helm-template" : "flask-k8s-mf-template";
 
 		String envName = serviceName + "-env-1";
 		String infraDefName = envName + "-infra-def-1";
 		String pipelineName = serviceName + "-pipeline-1";
-		String deploymentType = args[1].equalsIgnoreCase("spring-boot-helm-template") ? "NativeHelm" : "Kubernetes";
-
+		
 		HarnessClient harnessClient = new HarnessClient();
+
+		System.out.println("Bootstraping service: "+serviceName +" ,with template: "+templateName + "\n" + "Continue(Y/n):");
+		String proceed = System.console().readLine();
+
+		if(proceed == null || (proceed!=null && proceed.trim().equalsIgnoreCase("Y")))
+		{
+			System.out.println("Aborting..");
+			return;
+		}
 
 		try {
 			harnessClient.createHarnessEnvironment(envName);
 			logger.info("Created Harness Environment: " + envName);
-
+			String deploymentType = templateName.trim().equalsIgnoreCase("spring-boot-helm-template") ? "NativeHelm" : "Kubernetes";
 			harnessClient.createHarnessInfraDefinition(infraDefName,
 					envName.replace("-", ""), deploymentType, "default");
 			// harnessClient.createHarnessK8SConnector("auto-k8s-connector-kind","k8s-kind-mac-delegate");
@@ -60,7 +68,7 @@ public class ServiceBootstrapApplication implements CommandLineRunner {
 			// TODO: find a better way to identify when new repo is ready for new commit
 			Thread.sleep(20000);
 
-			if (args[1].equalsIgnoreCase("spring-boot-helm-template")) {
+			if (templateName.equalsIgnoreCase("spring-boot-helm-template")) {
 				harnessClient.createHarnessServiceHelm(serviceName, serviceName);
 				logger.info("Created Harness Service: " + serviceName);
 
@@ -71,8 +79,7 @@ public class ServiceBootstrapApplication implements CommandLineRunner {
 						serviceName);
 				logger.info(
 						"Created Harness Pipeline: " + pipelineName + " and Commited .harness folder in github repo");
-			}
-			else if (args[1].equalsIgnoreCase("flask-k8s-mf-template")) {
+			} else if (templateName.equalsIgnoreCase("flask-k8s-mf-template")) {
 				harnessClient.createHarnessServiceK8s(serviceName, serviceName);
 				logger.info("Created Harness Service: " + serviceName);
 
@@ -83,9 +90,9 @@ public class ServiceBootstrapApplication implements CommandLineRunner {
 						serviceName);
 				logger.info(
 						"Created Harness Pipeline: " + pipelineName + " and Commited .harness folder in github repo");
-			}
-			else
-				logger.error("This template is not available"+templateName);
+			} else
+				logger.error("This template is not available" + templateName);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("Service bootsrap failed", e.getMessage());
