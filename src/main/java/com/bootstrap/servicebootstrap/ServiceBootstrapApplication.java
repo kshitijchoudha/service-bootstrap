@@ -69,7 +69,7 @@ public class ServiceBootstrapApplication implements CommandLineRunner {
 
 			GitHubClient ghClient = new GitHubClient();
 			ghClient.createSpringBootHelmRepo(serviceName, templateName);
-			logger.info("Created GitHub Repo : " + serviceName + ",sleeping for 20s..");
+			logger.info("Created GitHub Repo : " + serviceName + ",waiting for resources to be ready in repository..");
 			// TODO: find a better way to identify when new repo is ready for new commit
 			Thread.sleep(20000);
 
