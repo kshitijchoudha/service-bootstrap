@@ -44,14 +44,19 @@ public class ServiceBootstrapApplication implements CommandLineRunner {
 		
 		HarnessClient harnessClient = new HarnessClient();
 
-		System.out.println("Bootstraping service: "+serviceName +" ,with template: "+templateName + "\n" + "Continue(Y/n):");
+		System.out.println("Bootstraping service: "+serviceName +" ,with template: "+templateName + "\n" + "Continue?[Y/n]:");
 		String proceed = System.console().readLine();
 
-		if(proceed == null || (proceed!=null && proceed.trim().equalsIgnoreCase("Y")))
+		if(proceed == null || (proceed!=null && proceed.trim().equalsIgnoreCase("Y")) || (proceed!=null && proceed.trim().equalsIgnoreCase("")))
 		{
-			System.out.println("Aborting..");
-			return;
+			System.out.println("Creating Github, Harness and Terrform resources..");
 		}
+        else
+        {
+            System.out.println("Aborting....");
+            return;
+        }
+		
 
 		try {
 			harnessClient.createHarnessEnvironment(envName);
