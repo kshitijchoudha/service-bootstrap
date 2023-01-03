@@ -37,7 +37,7 @@ public class ServiceBootstrapApplication implements CommandLineRunner {
 		System.out.println(
 				String.join("\n", ANSI_BLUE + "Enter number for service type and deployment type template to use",
 						"1. Spring Boot with Helm Deployment",
-						"2. Python Flask with kuberetes manifest deployment" + ANSI_BLUE));
+						"2. Python Flask with kubernetes manifest deployment" + ANSI_BLUE));
 
 		templateName = System.console().readLine();
 
